@@ -9,19 +9,55 @@
     <title>Document</title>
   </head>
   <body>
-    <div id="win"></div>
-    <div id="content">
-        <div id="gameboard">
-            <div class="cell one" symbol="0"></div>
-            <div class="cell two" symbol="1"></div>
-            <div class="cell three" symbol="2"></div>
-            <div class="cell four" symbol="3"></div>
-            <div class="cell five" symbol="4"></div>
-            <div class="cell six" symbol="5"></div>
-            <div class="cell seven" symbol="6"></div>
-            <div class="cell eight" symbol="7"></div>
-            <div class="cell nine" symbol="8"></div>
+    <div id="backdrop1">
+      <form action="/#" method="post">
+        <button id="start" type="submit">Start Game</button>
+        <div>
+          <label for="player1">Add a name for player1</label>
+          <input
+            type="text"
+            name="player1"
+            placeholder="player1"
+            value="player1"
+          />
         </div>
+        <div>
+          <label for="player2">Add a name for player2</label>
+          <input
+            type="text"
+            name="player2"
+            placeholder="player2"
+            value="player2"
+          />
+        </div>
+      </form>
+    </div>
+    <div id="content" style="display: none">
+      <div style="display:flex;">
+          <div id="win"></div>
+          <button id="reset">Reset</button>
+      </div>
+      <div id="mid">
+          <div class="name" id="player1"></div>
+          <div id="gameboard">
+            <div class="row">
+              <div class="cell one" symbol="0"></div>
+              <div class="cell two" symbol="1"></div>
+              <div class="cell three" symbol="2"></div>
+            </div>
+            <div class="row">
+              <div class="cell four" symbol="3"></div>
+              <div class="cell five" symbol="4"></div>
+              <div class="cell six" symbol="5"></div>
+            </div>
+            <div class="row">
+              <div class="cell seven" symbol="6"></div>
+              <div class="cell eight" symbol="7"></div>
+              <div class="cell nine" symbol="8"></div>
+            </div>
+          </div>
+          <div class="name" id="player2"></div>
+      </div>
     </div>
   </body>
 </html>
