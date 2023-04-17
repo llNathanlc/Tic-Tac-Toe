@@ -9,10 +9,12 @@ const playerFactory = (player) => {
   return { getName, playing };
 };
 
+const human = "X";
+const ai = "O";
+let currentPlayer = human;
+
 const gameFlow = (() => {
-  let won = false;
-  let lastPlayed = "";
-  const write = (p1, p2) => {
+  const PvP = (p1, p2) => {
     p2.playing = "";
     gameBoard.tiles.forEach(function (h) {
       Array.from(h.children).forEach(function (e) {
@@ -28,227 +30,117 @@ const gameFlow = (() => {
             e.setAttribute("symbol", "X");
             p1.playing = "";
             p2.playing = "playing";
-            lastPlayed = 0;
           } else if (p2.playing == "playing") {
             e.textContent = "O";
             e.setAttribute("symbol", "O");
             p2.playing = "";
             p1.playing = "playing";
-            lastPlayed = 1;
           }
         });
       });
     });
   };
-
-  const winner = (tiles) => {
-    tiles.forEach(function (e) {
-      e.addEventListener("click", function () {
-        if (
-          Array.from(document.querySelectorAll(".cell")).every(
-            (e) => e.textContent != ""
-          )
-        ) {
-          win.textContent = " Its a tie!";
-          
-        }
-        if (
-          tiles[0].children[0].getAttribute("symbol") ==
-            tiles[0].children[1].getAttribute("symbol") &&
-          tiles[0].children[0].getAttribute("symbol") ==
-            tiles[0].children[2].getAttribute("symbol")
-        ) {
-          won = true;
-          win.textContent =
-            "winner  " + gameControl.playerArray[lastPlayed].getName();
-          tiles[0].children[0].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[0].children[1].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[0].children[2].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-        }
-
-        if (
-          tiles[1].children[0].getAttribute("symbol") ==
-            tiles[1].children[1].getAttribute("symbol") &&
-          tiles[1].children[0].getAttribute("symbol") ==
-            tiles[1].children[2].getAttribute("symbol")
-        ) {
-          won = true;
-          win.textContent =
-            "winner  " + gameControl.playerArray[lastPlayed].getName();
-          tiles[1].children[0].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[1].children[1].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[1].children[2].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-        }
-        if (
-          tiles[2].children[0].getAttribute("symbol") ==
-            tiles[2].children[1].getAttribute("symbol") &&
-          tiles[2].children[0].getAttribute("symbol") ==
-            tiles[2].children[2].getAttribute("symbol")
-        ) {
-          won = true;
-          win.textContent =
-            "winner  " + gameControl.playerArray[lastPlayed].getName();
-          tiles[2].children[0].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[2].children[1].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[2].children[2].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-        }
-        if (
-          tiles[0].children[0].getAttribute("symbol") ==
-            tiles[1].children[0].getAttribute("symbol") &&
-          tiles[0].children[0].getAttribute("symbol") ==
-            tiles[2].children[0].getAttribute("symbol")
-        ) {
-          won = true;
-          win.textContent =
-            "winner  " + gameControl.playerArray[lastPlayed].getName();
-          tiles[0].children[0].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[1].children[0].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[2].children[0].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-        }
-        if (
-          tiles[0].children[1].getAttribute("symbol") ==
-            tiles[1].children[1].getAttribute("symbol") &&
-          tiles[0].children[1].getAttribute("symbol") ==
-            tiles[2].children[1].getAttribute("symbol")
-        ) {
-          won = true;
-          win.textContent =
-            "winner  " + gameControl.playerArray[lastPlayed].getName();
-          tiles[0].children[1].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[1].children[1].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[2].children[1].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-        }
-        if (
-          tiles[0].children[2].getAttribute("symbol") ==
-            tiles[1].children[2].getAttribute("symbol") &&
-          tiles[0].children[2].getAttribute("symbol") ==
-            tiles[2].children[2].getAttribute("symbol")
-        ) {
-          won = true;
-          win.textContent =
-            "winner  " + gameControl.playerArray[lastPlayed].getName();
-          tiles[0].children[2].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[1].children[2].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[2].children[2].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-        }
-        if (
-          tiles[0].children[0].getAttribute("symbol") ==
-            tiles[1].children[1].getAttribute("symbol") &&
-          tiles[0].children[0].getAttribute("symbol") ==
-            tiles[2].children[2].getAttribute("symbol")
-        ) {
-          won = true;
-          win.textContent =
-            "winner  " + gameControl.playerArray[lastPlayed].getName();
-          tiles[0].children[0].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[1].children[1].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[2].children[2].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-        }
-        if (
-          tiles[0].children[2].getAttribute("symbol") ==
-            tiles[1].children[1].getAttribute("symbol") &&
-          tiles[0].children[2].getAttribute("symbol") ==
-            tiles[2].children[0].getAttribute("symbol")
-        ) {
-          won = true;
-          win.textContent =
-            "winner  " + gameControl.playerArray[lastPlayed].getName();
-          tiles[0].children[2].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[1].children[1].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-          tiles[2].children[0].setAttribute(
-            "style",
-            "background-color:rgb(172, 255, 127)"
-          );
-        }
+  const PvE = (p1,ia) => {
+    gameBoard.tiles.forEach(function (h) {
+      Array.from(h.children).forEach(function (e) {
+        e.addEventListener("pointerdown", function () {
+          let result = getWinner();
+          if (result !== "") {
+            return;
+          }
+          if (e.textContent != "") {
+            return;
+          }
+          if (currentPlayer == human) {
+            e.textContent = "X";
+            currentPlayer = ai;
+          }
+        });
+        e.addEventListener("pointerup", function () {
+          let result = getWinner();
+          if (result !== "") {
+            return;
+          }
+          if (currentPlayer == ai) {
+            setTimeout(() => getBestMove(gameBoard.tiles), 200);
+          }
+        });
       });
     });
   };
   const resetButton = () => {
     reset.addEventListener("pointerdown", function () {
-      let i = 0;
       Array.from(document.querySelectorAll(".cell")).forEach((e) => {
         e.textContent = "";
-        e.removeAttribute("style");
-        e.setAttribute("symbol", i);
-        i++;
       });
-      won = false;
       win.textContent = "";
       gameControl.playerArray[0].playing = "playing";
       gameControl.playerArray[1].playing = "";
+      currentPlayer = human;
     });
   };
-  return { write, winner, resetButton };
+  return { PvP, PvE, resetButton };
 })();
+
+function checkGameOver() {
+  const win = getWinner();
+  const isBoardFull = Array.from(document.querySelectorAll(".cell")).every(
+    (e) => e.textContent != ""
+  );
+  return win !== null || isBoardFull;
+}
+function getWinner() {
+  const board = Array.from(gameBoard.tiles).map((row) =>
+    Array.from(row.children).map((cell) => cell.textContent)
+  );
+  let winner = "";
+
+  for (const row of board) {
+    if (row[0] !== "" && row[0] === row[1] && row[1] === row[2]) {
+      winner = row[0];
+    }
+  }
+
+  for (let col = 0; col < 3; col++) {
+    if (
+      board[0][col] !== "" &&
+      board[0][col] === board[1][col] &&
+      board[1][col] === board[2][col]
+    ) {
+      winner = board[0][col];
+    }
+  }
+
+  if (
+    board[0][0] !== "" &&
+    board[0][0] === board[1][1] &&
+    board[1][1] === board[2][2]
+  ) {
+    winner = board[0][0];
+  }
+
+  if (
+    board[0][2] !== "" &&
+    board[0][2] === board[1][1] &&
+    board[1][1] === board[2][0]
+  ) {
+    winner = board[0][2];
+  }
+
+  let openSpots = 0;
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (gameBoard.tiles[i].children[j].textContent === "") {
+        openSpots++;
+      }
+    }
+  }
+  if (winner === "" && openSpots == 0) {
+    return "tie";
+  } else {
+    return winner;
+  }
+}
 
 const gameControl = (() => {
   const playerArray = [];
@@ -268,7 +160,7 @@ const gameControl = (() => {
         key = playerFactory(value);
         playerArray.push(key);
       });
-      gameFlow.write(playerArray[0], playerArray[1]);
+      gameFlow.PvE(playerArray[0], playerArray[1]);
       player1.textContent = playerArray[0].getName();
       player2.textContent = playerArray[1].getName();
     });
@@ -277,8 +169,63 @@ const gameControl = (() => {
   return { playerArray, startGame };
 })();
 
-gameFlow.winner(gameBoard.tiles);
 gameControl.startGame();
 gameFlow.resetButton();
 
+function getBestMove(boardRows) {
+  let bestMove = -Infinity;
+  let move = null;
+  for (const row of boardRows) {
+    for (const cell of row.children) {
+      if (cell.textContent === "") {
+        let result = getWinner();
+        if (result !== "") {
+          return;
+        }
+        if (cell.textContent != "") {
+          return;
+        }
+        cell.textContent = "O";
+        let score = minimax(boardRows, 5, false);
+        cell.textContent = "";
+        if (score > bestMove) {
+          bestMove = score;
+          move = cell;
+        }
+      }
+    }
+  }
+  move.textContent = "O";
+  currentPlayer = human;
+}
+function minimax(boardRows, depth, isMaximizingPlayer) {
+  const result = getWinner();
+  if (result !== "" || depth === 0) {
+    if (result === "O") return 1;
+    if (result === "X") return -1;
+    return 0;
+  }
 
+  let bestValue = isMaximizingPlayer ? -Infinity : Infinity;
+
+  for (const row of boardRows) {
+    for (const cell of row.children) {
+      if (cell.textContent === "") {
+        let result = getWinner();
+        if (result !== "") {
+          return;
+        }
+        if (cell.textContent != "") {
+          return;
+        }
+        cell.textContent = isMaximizingPlayer ? "O" : "X";
+        const value = minimax(boardRows, depth - 1, !isMaximizingPlayer);
+        cell.textContent = "";
+        bestValue = isMaximizingPlayer
+          ? Math.max(bestValue, value)
+          : Math.min(bestValue, value);
+      }
+    }
+  }
+  return bestValue;
+}
