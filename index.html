@@ -10,8 +10,8 @@
   </head>
   <body>
     <div id="backdrop1">
-      <form action="/#" method="post">
-        <button id="start" type="submit">Start Game</button>
+      <form id="formm" action="/#" method="post">
+        <div id="gamemode" style="text-align: center">Player vs Player</div>
         <div>
           <label for="player1">Add a name for player1</label>
           <input
@@ -22,47 +22,47 @@
           />
         </div>
         <div>
-          <label for="player2">Add a name for player2</label>
+          <label id="labelp2" for="player2">Add a name for player2</label>
           <input
+            id="inputp2"
             type="text"
             name="player2"
             placeholder="player2"
             value="player2"
           />
         </div>
+        <button id="start" type="submit">Start Game</button>
       </form>
     </div>
-    <div id="backdrop2" style="display:none">
-      <div id="winnerCard">
-
-      </div>
+    <div id="backdrop2" style="display: none">
+      <div id="winnerCard"></div>
     </div>
     <div id="content" style="display: none">
       <button id="reset">Reset</button>
       <div id="win"></div>
-      <div style="display:flex; gap:2rem;">
-          <div class="name" id="player1"></div>
-          <div id="score"></div>
-          <div class="name" id="player2"></div>
+      <div style="display: flex; gap: 2rem">
+        <div class="name" id="player1"></div>
+        <div id="score"></div>
+        <div class="name" id="player2"></div>
       </div>
       <div id="mid">
-          <div id="gameboard">
-            <div class="row">
-              <div class="cell one"></div>
-              <div class="cell two"></div>
-              <div class="cell three"></div>
-            </div>
-            <div class="row">
-              <div class="cell four"></div>
-              <div class="cell five"></div>
-              <div class="cell six"></div>
-            </div>
-            <div class="row">
-              <div class="cell seven"></div>
-              <div class="cell eight"></div>
-              <div class="cell nine"></div>
-            </div>
+        <div id="gameboard">
+          <div class="row">
+            <div class="cell one"></div>
+            <div class="cell two"></div>
+            <div class="cell three"></div>
           </div>
+          <div class="row">
+            <div class="cell four"></div>
+            <div class="cell five"></div>
+            <div class="cell six"></div>
+          </div>
+          <div class="row">
+            <div class="cell seven"></div>
+            <div class="cell eight"></div>
+            <div class="cell nine"></div>
+          </div>
+        </div>
       </div>
     </div>
   </body>

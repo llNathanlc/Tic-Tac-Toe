@@ -1,4 +1,5 @@
 const playerArray = [];
+
 const gameBoard = (() => {
   const tiles = document.querySelectorAll(".row");
   const backdropCard = () => {
@@ -15,8 +16,8 @@ const playerFactory = (player) => {
   let score = 0;
   const getScore = () => score;
   const addScore = () => score++;
-  const resetScore = () => score = 0;
-  return { getName,getScore,addScore,score, resetScore };
+  const resetScore = () => (score = 0);
+  return { getName, getScore, addScore, score, resetScore };
 };
 const human = "X";
 const ai = "O";
@@ -28,28 +29,38 @@ const gameFlow = (() => {
     gameBoard.tiles.forEach(function (h) {
       Array.from(h.children).forEach(function (e) {
         e.addEventListener("pointerdown", function () {
-          if (won) {
+          let result = getWinner();
+          if (result !== "") {
+            backdrop2.setAttribute("style", "display:flex;");
+            const winner = getWinner();
+            if (winner === "X") {
+              winnerCard.textContent = "Player1 won";
+              p1.addScore();
+              score.textContent = p1.getScore() + "  -  " + ia.getScore();
+            } else {
+              winnerCard.textContent = "I'ts a draw";
+            }
             return;
           }
-          if (e.textContent != "") {
-            return;
-          }
-          if (p1.playing == "playing") {
-            e.textContent = "X";
-            e.setAttribute("symbol", "X");
-            p1.playing = "";
-            p2.playing = "playing";
-          } else if (p2.playing == "playing") {
+          if (currentPlayer == 'player1') {
+            e.textContent = 'X';
+            currentPlayer = 'player2'
+          } else if (currentPlayer == 'player2') {
             e.textContent = "O";
-            e.setAttribute("symbol", "O");
-            p2.playing = "";
-            p1.playing = "playing";
+            currentPlayer = 'player1'
           }
         });
       });
     });
   };
   const PvE = (p1, ia) => {
+    const getDifficulty = () => {
+      let difficulty = ia.getName();
+      if (difficulty == "easy") return 1;
+      if (difficulty == "medium") return 2;
+      if (difficulty == "hard") return 4;
+      if (difficulty == "impossible") return 5;
+    };
     gameBoard.tiles.forEach(function (h) {
       Array.from(h.children).forEach(function (e) {
         e.addEventListener("pointerdown", function () {
@@ -74,14 +85,14 @@ const gameFlow = (() => {
             if (winner === "X") {
               winnerCard.textContent = "Player1 won";
               p1.addScore();
-              score.textContent = p1.getScore() + '  -  ' + ia.getScore();
+              score.textContent = p1.getScore() + "  -  " + ia.getScore();
             } else {
               winnerCard.textContent = "I'ts a draw";
             }
             return;
           }
           if (currentPlayer == ai) {
-            setTimeout(() => getBestMove(gameBoard.tiles), 200);
+            setTimeout(() => getBestMove(gameBoard.tiles, getDifficulty()), 200);
           }
         });
       });
@@ -95,7 +106,8 @@ const gameFlow = (() => {
       win.textContent = "";
       gameControl.playerArray[0].resetScore();
       gameControl.playerArray[1].resetScore();
-      score.textContent = playerArray[0].getScore() + ' - '+ playerArray[1].getScore();
+      score.textContent =
+        playerArray[0].getScore() + " - " + playerArray[1].getScore();
       currentPlayer = human;
     });
   };
@@ -170,7 +182,40 @@ function getWinner() {
   }
 }
 const gameControl = (() => {
+  let gamemodeState = "pvp";
+  const gameMode = () => {
+    const input = document.querySelector("form :nth-child(3) > #inputp2");
+    const parent = document.querySelector("form :nth-child(3)");
+    const select = document.createElement("select");
+    const difficulty = ["easy", "medium", "hard", "impossible"];
+    for (const option of difficulty) {
+      const op = document.createElement("option");
+      op.setAttribute("value", `${option}`);
+      op.textContent = option;
+      select.appendChild(op);
+    }
+    select.setAttribute("name", "player2");
+    gamemode.addEventListener("pointerdown", function () {
+      if (this.textContent == "Player vs AI") {
+        gamemodeState = "pvp";
+        currentPlayer = 'player1'
+        this.textContent = "Player vs Player";
+        labelp2.textContent = "Add a name for player2";
+        parent.removeChild(select);
+        parent.appendChild(input);
+      } else {
+        gamemodeState = "pve";
+        currentPlayer = human;
+        this.textContent = "Player vs AI";
+        labelp2.textContent = "Choose AI dificultty";
+        parent.removeChild(input);
+        parent.appendChild(select);
+      }
+    });
+  };
+
   const startGame = () => {
+    gameMode();
     backdrop1.addEventListener("submit", function (e) {
       e.preventDefault();
 
@@ -180,26 +225,39 @@ const gameControl = (() => {
         backdrop1.style.display = "none";
         content.style.display = "flex";
       }
-
-      const namesJson = new FormData(e.target);
-      namesJson.forEach((value, key) => {
-        key = playerFactory(value);
-        playerArray.push(key);
-      });
-      gameFlow.PvE(playerArray[0], playerArray[1]);
-      player1.textContent = playerArray[0].getName();
-      player2.textContent = playerArray[1].getName();
-      score.textContent = playerArray[0].getScore() + '  -  ' + playerArray[1].getScore();
+      if (gamemodeState == "pvp") {
+        const namesJson = new FormData(e.target);
+        namesJson.forEach((value, key) => {
+          key = playerFactory(value);
+          playerArray.push(key);
+        });
+        gameFlow.PvP(playerArray[0], playerArray[1]);
+        player1.textContent = playerArray[0].getName();
+        player2.textContent = playerArray[1].getName();
+        score.textContent =
+          playerArray[0].getScore() + "  -  " + playerArray[1].getScore();
+      } else {
+        const namesJson = new FormData(e.target);
+        namesJson.forEach((value, key) => {
+          key = playerFactory(value);
+          playerArray.push(key);
+        });
+        gameFlow.PvE(playerArray[0], playerArray[1]);
+        player1.textContent = playerArray[0].getName();
+        player2.textContent = "AI";
+        score.textContent =
+          playerArray[0].getScore() + "  -  " + playerArray[1].getScore();
+      }
     });
   };
 
-  return { playerArray, startGame };
+  return { playerArray, startGame, gameMode };
 })();
 
 gameControl.startGame();
 gameFlow.resetButton();
 gameBoard.backdropCard();
-function getBestMove(boardRows) {
+function getBestMove(boardRows, depth) {
   let bestMove = -Infinity;
   let move = null;
   for (const row of boardRows) {
@@ -213,7 +271,7 @@ function getBestMove(boardRows) {
           return;
         }
         cell.textContent = "O";
-        let score = minimax(boardRows, 1, false);
+        let score = minimax(boardRows, depth, false);
         cell.textContent = "";
         if (score > bestMove) {
           bestMove = score;
@@ -229,7 +287,8 @@ function getBestMove(boardRows) {
     backdrop2.setAttribute("style", "display:flex;");
     winnerCard.textContent = "Ai won";
     playerArray[1].addScore();
-    score.textContent = playerArray[0].getScore() + ' - ' + playerArray[1].getScore();
+    score.textContent =
+      playerArray[0].getScore() + " - " + playerArray[1].getScore();
     return;
   }
 }
