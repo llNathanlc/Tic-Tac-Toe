@@ -1,14 +1,23 @@
+const playerArray = [];
 const gameBoard = (() => {
   const tiles = document.querySelectorAll(".row");
-  return { tiles };
+  const backdropCard = () => {
+    backdrop2.addEventListener("pointerdown", function () {
+      gameFlow.resetBoard();
+      backdrop2.setAttribute("style", "display:none");
+    });
+  };
+  return { tiles, backdropCard };
 })();
 
 const playerFactory = (player) => {
   const getName = () => player;
-  const playing = "playing";
-  return { getName, playing };
+  let score = 0;
+  const getScore = () => score;
+  const addScore = () => score++;
+  const resetScore = () => score = 0;
+  return { getName,getScore,addScore,score, resetScore };
 };
-
 const human = "X";
 const ai = "O";
 let currentPlayer = human;
@@ -40,12 +49,13 @@ const gameFlow = (() => {
       });
     });
   };
-  const PvE = (p1,ia) => {
+  const PvE = (p1, ia) => {
     gameBoard.tiles.forEach(function (h) {
       Array.from(h.children).forEach(function (e) {
         e.addEventListener("pointerdown", function () {
           let result = getWinner();
           if (result !== "") {
+            backdrop2.setAttribute("style", "display:flex;");
             return;
           }
           if (e.textContent != "") {
@@ -59,6 +69,15 @@ const gameFlow = (() => {
         e.addEventListener("pointerup", function () {
           let result = getWinner();
           if (result !== "") {
+            backdrop2.setAttribute("style", "display:flex;");
+            const winner = getWinner();
+            if (winner === "X") {
+              winnerCard.textContent = "Player1 won";
+              p1.addScore();
+              score.textContent = p1.getScore() + '  -  ' + ia.getScore();
+            } else {
+              winnerCard.textContent = "I'ts a draw";
+            }
             return;
           }
           if (currentPlayer == ai) {
@@ -74,20 +93,29 @@ const gameFlow = (() => {
         e.textContent = "";
       });
       win.textContent = "";
-      gameControl.playerArray[0].playing = "playing";
-      gameControl.playerArray[1].playing = "";
+      gameControl.playerArray[0].resetScore();
+      gameControl.playerArray[1].resetScore();
+      score.textContent = playerArray[0].getScore() + ' - '+ playerArray[1].getScore();
       currentPlayer = human;
     });
   };
-  return { PvP, PvE, resetButton };
+  const resetBoard = () => {
+    Array.from(document.querySelectorAll(".cell")).forEach((e) => {
+      e.textContent = "";
+    });
+    win.textContent = "";
+    gameControl.playerArray[0].playing = "playing";
+    gameControl.playerArray[1].playing = "";
+    currentPlayer = human;
+  };
+  return { PvP, PvE, resetButton, resetBoard };
 })();
 
-function checkGameOver() {
-  const win = getWinner();
+function checkDraw() {
   const isBoardFull = Array.from(document.querySelectorAll(".cell")).every(
     (e) => e.textContent != ""
   );
-  return win !== null || isBoardFull;
+  return isBoardFull;
 }
 function getWinner() {
   const board = Array.from(gameBoard.tiles).map((row) =>
@@ -141,9 +169,7 @@ function getWinner() {
     return winner;
   }
 }
-
 const gameControl = (() => {
-  const playerArray = [];
   const startGame = () => {
     backdrop1.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -163,6 +189,7 @@ const gameControl = (() => {
       gameFlow.PvE(playerArray[0], playerArray[1]);
       player1.textContent = playerArray[0].getName();
       player2.textContent = playerArray[1].getName();
+      score.textContent = playerArray[0].getScore() + '  -  ' + playerArray[1].getScore();
     });
   };
 
@@ -171,7 +198,7 @@ const gameControl = (() => {
 
 gameControl.startGame();
 gameFlow.resetButton();
-
+gameBoard.backdropCard();
 function getBestMove(boardRows) {
   let bestMove = -Infinity;
   let move = null;
@@ -186,7 +213,7 @@ function getBestMove(boardRows) {
           return;
         }
         cell.textContent = "O";
-        let score = minimax(boardRows, 5, false);
+        let score = minimax(boardRows, 1, false);
         cell.textContent = "";
         if (score > bestMove) {
           bestMove = score;
@@ -197,12 +224,20 @@ function getBestMove(boardRows) {
   }
   move.textContent = "O";
   currentPlayer = human;
+  let result = getWinner();
+  if (result !== "") {
+    backdrop2.setAttribute("style", "display:flex;");
+    winnerCard.textContent = "Ai won";
+    playerArray[1].addScore();
+    score.textContent = playerArray[0].getScore() + ' - ' + playerArray[1].getScore();
+    return;
+  }
 }
 function minimax(boardRows, depth, isMaximizingPlayer) {
   const result = getWinner();
   if (result !== "" || depth === 0) {
-    if (result === "O") return 1;
-    if (result === "X") return -1;
+    if (result === "O") return 10;
+    if (result === "X") return -10;
     return 0;
   }
 

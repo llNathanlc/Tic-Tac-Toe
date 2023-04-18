@@ -52,6 +52,7 @@ table {
     height:99.8vh;
     align-items: center;
     justify-content: center;
+    gap:1rem;
 }
 #gameboard{
     display:grid;
@@ -74,6 +75,9 @@ table {
     align-items: center;
     justify-content: center;
 }
+.cell:hover{
+    cursor:default
+}
 form{
     position:absolute;
     display:grid;
@@ -95,4 +99,28 @@ button{
 #mid{
     display: flex;
     align-items: center;
+}
+#backdrop2{
+    position:absolute;
+    z-index: 2;
+    height:100%;
+    width:100%;
+    background-color:rgba(196, 196, 196,0.01);
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(3px);
+}
+#winnerCard{
+    width:20rem;
+    height:5rem;
+    background-color: rgba(128, 128, 128, 0);
+    font-size: 3rem;
+    text-align: center;
+    font-weight: bolder;
+    color:rgb(0, 0, 0);
+}
+#score{
+    letter-spacing: 5px;
+    font-size: x-large;
+    font-weight: 900;
 }
