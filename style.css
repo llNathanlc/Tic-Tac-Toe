@@ -3,7 +3,7 @@
    License: none (public domain)
 */
 :root {
-  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 html,
 body,
@@ -131,24 +131,34 @@ table {
 }
 /* --------------------- */
 @keyframes cells-animation {
-    0% {
-        -webkit-transform: scale(1.5);
-        transform: scale(1.5);
-        -webkit-filter: blur(4px);
-        filter: blur(4px);
-        opacity: 0;
-    }
-    100% {
-        -webkit-transform: scale(1);
-        transform: scale(1);
-        -webkit-filter: blur(0px);
-        filter: blur(0px);
-        opacity: 1;
-    }  
+  0% {
+    -webkit-transform: scale(1.5);
+    transform: scale(1.5);
+    -webkit-filter: blur(4px);
+    filter: blur(4px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    -webkit-filter: blur(0px);
+    filter: blur(0px);
+    opacity: 1;
+  }
+}
+@keyframes highlight-turn {
+  from {
+    background-color: rgb(231, 231, 238);
+  }
+  to {
+    background-color: rgb(176, 215, 255);
+    box-shadow: 0px 0px 20px 1px rgb(176, 215, 255);
+
+  }
 }
 @font-face {
-    font-family: lemon;
-    src: url(res/Lemon\ Tuesday.otf);
+  font-family: lemon;
+  src: url(res/Lemon\ Tuesday.otf);
 }
 #content {
   display: flex;
@@ -181,7 +191,7 @@ table {
   background-color: rgba(236, 236, 236, 0.427);
   border-radius: 9px;
   box-shadow: 5px 5px 6px rgba(117, 103, 103, 0.342);
-  font-family:lemon;
+  font-family: lemon;
 }
 .cell:hover {
   cursor: default;
@@ -189,8 +199,8 @@ table {
   background-color: rgba(250, 235, 215, 0.566);
   transform: scale(1.05);
 }
-.animation{
-    animation: cells-animation 0.3s;
+.animation {
+  animation: cells-animation 0.3s;
 }
 form {
   position: absolute;
@@ -265,18 +275,24 @@ button:hover {
   transform: scale(1);
 }
 #backdrop1 {
-position: absolute;
+  position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
   height: 100%;
   width: 100%;
   background-color: rgba(193, 193, 193, 0.443);
-
 }
 #title {
   font-size: 3rem;
 }
-button{
-    border: none;
+button {
+  border: none;
+}
+.name {
+  background-color: rgb(231, 231, 238);
+  padding: 0.5rem;
+  border-radius: 20px;
+  width: 4rem;
+  text-align: center;
 }

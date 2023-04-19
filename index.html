@@ -15,22 +15,22 @@
         <div id="gamemode" class='on' style="text-align: center">Player vs Player</div>
         <div style="display:flex; justify-content: space-evenly;flex-wrap: wrap;">
           <div>
-            <label for="player1">Add a name for player1</label>
+            <label for="player1">Add a name for Player 1</label>
             <input
               type="text"
               name="player1"
-              placeholder="player1"
-              value="player1"
+              placeholder="Player 1"
+              value="Player 1"
             />
           </div>
           <div id="parentp2">
-            <label id="labelp2" for="player2">Add a name for player2</label>
+            <label id="labelp2" for="player2">Add a name for Player 2</label>
             <input
               id="inputp2"
               type="text"
               name="player2"
-              placeholder="player2"
-              value="player2"
+              placeholder="Player 2"
+              value="Player 2"
             />
           </div>
         </div>
@@ -41,7 +41,10 @@
       <div id="winnerCard"></div>
     </div>
     <div id="content" style="display: none">
-      <button id="reset">Reset</button>
+      <div>
+        <button id="goback">Go back</button>
+        <button id="reset">Reset</button>
+      </div>
       <div id="win"></div>
       <div style="display: flex; gap: 2rem">
         <div class="name" id="player1"></div>

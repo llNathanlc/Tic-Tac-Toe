@@ -1,21 +1,46 @@
 const playerArray = [];
 
 const gameBoard = (() => {
-  const tiles = document.querySelectorAll(".row");
+  let tiles = document.querySelectorAll(".row");
   const backdropCard = () => {
     backdrop2.addEventListener("pointerdown", function () {
+      turn++;
       gameFlow.resetBoard();
       backdrop2.setAttribute("style", "display:none");
+      if(gameControl.getGameMode() === "pve" && turn % 2 !== 0) {
+        currentPlayer = human;
+        setTimeout(() => getBestMove(tiles, playerArray[1].getName()), 2);
+      }
+      if (gameControl.getGameMode() === "pvp" && turn % 2 !== 0) {
+        currentPlayer = "player2";
+      }
     });
   };
-  return { tiles, backdropCard };
+  const goBack = () => {
+    goback.addEventListener("pointerdown", function () {
+      gameFlow.resetAll();
+      console.log(playerArray);
+      backdrop1.style.display = "flex";
+      content.style.display = 'none';
+    });
+  };
+  return { tiles, backdropCard,goBack };
 })();
-const on= document.querySelector('.on')
-on.addEventListener('pointerleave',function(){
-  on.classList.add('unhover');
-})
+const on = document.querySelector(".on");
+on.addEventListener("pointerleave", function () {
+  on.classList.add("unhover");
+});
+const controller = new AbortController();
+const { signal } = controller;
 const playerFactory = (player) => {
-  const getName = () => player;
+  const getName = () => {
+    if (player == "easy") return 2;
+    if (player == "medium") return 4;
+    if (player == "impossible") return 5;
+    else {
+      return player;
+    }
+  };
   let score = 0;
   const getScore = () => score;
   const addScore = () => score++;
@@ -25,14 +50,15 @@ const playerFactory = (player) => {
 const human = "X";
 const ai = "O";
 let currentPlayer = "player1";
-
+let turn = 0;
+let difficulty = 0;
 const gameFlow = (() => {
   const PvP = (p1, p2) => {
     p2.playing = "";
     gameBoard.tiles.forEach(function (h) {
       Array.from(h.children).forEach(function (e) {
         e.addEventListener("pointerdown", function () {
-          this.classList.add('animation')
+          this.classList.add("animation");
           let result = getWinner();
           if (result !== "") {
             backdrop2.setAttribute("style", "display:flex;");
@@ -50,24 +76,39 @@ const gameFlow = (() => {
             return;
           }
           if (currentPlayer == "player1") {
+            player2.setAttribute(
+              "style",
+              "animation:highlight-turn 1s;animation-fill-mode: forwards;"
+            );
+            player1.setAttribute(
+              "style",
+              "background-color:rgb(231, 231, 238)"
+            );
             e.textContent = "X";
             currentPlayer = "player2";
           } else if (currentPlayer == "player2") {
+            player2.setAttribute(
+              "style",
+              "background-color:rgb(231, 231, 238)"
+            );
+            player1.setAttribute(
+              "style",
+              "animation:highlight-turn 1s;animation-fill-mode: forwards"
+            );
             e.textContent = "O";
             currentPlayer = "player1";
           }
         });
-        e.addEventListener('pointerup',function(){
+        e.addEventListener("pointerup", function () {
           let result = getWinner();
           if (result !== "") {
             backdrop2.setAttribute("style", "display:flex;");
             const winner = getWinner();
             if (winner === "X") {
-              winnerCard.textContent = p1.getName() +" won!";
+              winnerCard.textContent = p1.getName() + " won!";
               p1.addScore();
               score.textContent = p1.getScore() + "  -  " + p2.getScore();
-            }
-            else if (winner === "O") {
+            } else if (winner === "O") {
               winnerCard.textContent = p2.getName() + " won!";
               p2.addScore();
               score.textContent = p1.getScore() + "  -  " + p2.getScore();
@@ -76,22 +117,15 @@ const gameFlow = (() => {
             }
             return;
           }
-        })
+        });
       });
     });
   };
   const PvE = (p1, ia) => {
-    const getDifficulty = () => {
-      let difficulty = ia.getName();
-      if (difficulty == "easy") return 1;
-      if (difficulty == "medium") return 3;
-      if (difficulty == "hard") return 5;
-      if (difficulty == "impossible") return 6;
-    };
     gameBoard.tiles.forEach(function (h) {
       Array.from(h.children).forEach(function (e) {
         e.addEventListener("pointerdown", function () {
-          this.classList.add('animation')
+          this.classList.add("animation");
           let result = getWinner();
           if (result !== "") {
             backdrop2.setAttribute("style", "display:flex;");
@@ -100,8 +134,16 @@ const gameFlow = (() => {
           if (e.textContent != "") {
             return;
           }
-          if (currentPlayer == human) {
+          if (currentPlayer === human) {
             e.textContent = "X";
+            player1.setAttribute(
+              "style",
+              "background-color:rgb(231, 231, 238)"
+            );
+            player2.setAttribute(
+              "style",
+              "animation:highlight-turn 0.5s;animation-fill-mode: forwards"
+            );
             currentPlayer = ai;
           }
         });
@@ -111,7 +153,7 @@ const gameFlow = (() => {
             backdrop2.setAttribute("style", "display:flex;");
             const winner = getWinner();
             if (winner === "X") {
-              winnerCard.textContent = "Player1 won";
+              winnerCard.textContent = "Player1 won!";
               p1.addScore();
               score.textContent = p1.getScore() + "  -  " + ia.getScore();
             } else {
@@ -119,11 +161,10 @@ const gameFlow = (() => {
             }
             return;
           }
-          if (currentPlayer == ai) {
-            setTimeout(
-              () => getBestMove(gameBoard.tiles, getDifficulty()),
-              200
-            );
+          if (currentPlayer === ai) {
+            setTimeout(() => getBestMove(gameBoard.tiles, ia.getName()), 200);
+            console.log(playerArray)
+            console.log('l')
           }
         });
       });
@@ -133,24 +174,35 @@ const gameFlow = (() => {
     reset.addEventListener("pointerdown", function () {
       Array.from(document.querySelectorAll(".cell")).forEach((e) => {
         e.textContent = "";
-        e.classList.remove('animation');
+        e.classList.remove("animation");
       });
       win.textContent = "";
+      turn = 0;
       gameControl.playerArray[0].resetScore();
       gameControl.playerArray[1].resetScore();
       score.textContent =
         playerArray[0].getScore() + " - " + playerArray[1].getScore();
-        if (gameControl.getGameMode() === "pve") {
-          currentPlayer = human;
-        } else {
-          currentPlayer = "player1";
-        }
+      if (gameControl.getGameMode() === "pve") {
+        currentPlayer = human;
+        player2.setAttribute("style", "background-color:rgb(231, 231, 238)");
+        player1.setAttribute(
+          "style",
+          "animation:highlight-turn 0.5s;animation-fill-mode: forwards"
+        );
+      } else {
+        currentPlayer = "player1";
+        player2.setAttribute("style", "background-color:rgb(231, 231, 238)");
+        player1.setAttribute(
+          "style",
+          "animation:highlight-turn 0.5s;animation-fill-mode: forwards"
+        );
+      }
     });
   };
   const resetBoard = () => {
     Array.from(document.querySelectorAll(".cell")).forEach((e) => {
       e.textContent = "";
-      e.classList.remove('animation');
+      e.classList.remove("animation");
     });
     win.textContent = "";
     score.textContent =
@@ -161,7 +213,37 @@ const gameFlow = (() => {
       currentPlayer = "player1";
     }
   };
-  return { PvP, PvE, resetButton, resetBoard };
+  const resetAll = () => {
+    Array.from(document.querySelectorAll(".cell")).forEach((e) => {
+      e.textContent = "";
+      e.classList.remove("animation");
+    });
+    win.textContent = "";
+    turn = 0;
+    gameControl.playerArray[0].resetScore();
+    gameControl.playerArray[1].resetScore();
+    score.textContent =
+      playerArray[0].getScore() + " - " + playerArray[1].getScore();
+    if (gameControl.getGameMode() === "pve") {
+      currentPlayer = human;
+      player2.setAttribute("style", "background-color:rgb(231, 231, 238)");
+      player1.setAttribute(
+        "style",
+        "animation:highlight-turn 0.5s;animation-fill-mode: forwards"
+      );
+    } else {
+      currentPlayer = "player1";
+      player2.setAttribute("style", "background-color:rgb(231, 231, 238)");
+      player1.setAttribute(
+        "style",
+        "animation:highlight-turn 0.5s;animation-fill-mode: forwards"
+      );
+    }
+    while(playerArray.length !== 0){
+      playerArray.pop();
+    }
+  };
+  return { PvP, PvE, resetButton, resetBoard, resetAll };
 })();
 
 function checkDraw() {
@@ -229,7 +311,7 @@ const gameControl = (() => {
     const input = document.querySelector("#inputp2");
     const parent = document.querySelector("#parentp2");
     const select = document.createElement("select");
-    const difficulty = ["easy", "medium", "hard", "impossible"];
+    const difficulty = ["easy", "medium", "impossible"];
     for (const option of difficulty) {
       const op = document.createElement("option");
       op.setAttribute("value", `${option}`);
@@ -242,7 +324,7 @@ const gameControl = (() => {
         gamemodeState = "pvp";
         currentPlayer = "player1";
         this.textContent = "Player vs Player";
-        labelp2.textContent = "Add a name for player2";
+        labelp2.textContent = "Add a name for Player 2";
         parent.removeChild(select);
         parent.appendChild(input);
       } else {
@@ -260,7 +342,6 @@ const gameControl = (() => {
     gameMode();
     backdrop1.addEventListener("submit", function (e) {
       e.preventDefault();
-
       if (backdrop1.style.display === "none") {
         backdrop1.style.display = "flex";
       } else {
@@ -275,6 +356,10 @@ const gameControl = (() => {
         });
         gameFlow.PvP(playerArray[0], playerArray[1]);
         player1.textContent = playerArray[0].getName();
+        player1.setAttribute(
+          "style",
+          "animation:highlight-turn 0.5s;animation-fill-mode: forwards"
+        );
         player2.textContent = playerArray[1].getName();
         score.textContent =
           playerArray[0].getScore() + "  -  " + playerArray[1].getScore();
@@ -286,22 +371,38 @@ const gameControl = (() => {
         });
         gameFlow.PvE(playerArray[0], playerArray[1]);
         player1.textContent = playerArray[0].getName();
+        player1.setAttribute(
+          "style",
+          "animation:highlight-turn 0.5s;animation-fill-mode: forwards"
+        );
         player2.textContent = "AI";
         score.textContent =
           playerArray[0].getScore() + "  -  " + playerArray[1].getScore();
       }
     });
   };
-
-  return { playerArray, startGame, gameMode, getGameMode };
+  const reinitialize = () => {
+    if (gamemodeState === 'pvp'){
+      gameFlow.PvP(playerArray[0],playerArray[1]);
+    }
+    else {gameFlow.PvE(playerArray[0],playerArray[1]);}
+  }
+  return { playerArray, startGame, gameMode, getGameMode,reinitialize };
 })();
 
 gameControl.startGame();
 gameFlow.resetButton();
 gameBoard.backdropCard();
+gameBoard.goBack();
 function getBestMove(boardRows, depth) {
   let bestMove = -Infinity;
   let move = null;
+  player2.setAttribute("style", "background-color:rgb(231, 231, 238)");
+  player1.setAttribute(
+    "style",
+    "animation:highlight-turn 0.5s;animation-fill-mode: forwards"
+  );
+
   for (const row of boardRows) {
     for (const cell of row.children) {
       if (cell.textContent === "") {
@@ -313,7 +414,7 @@ function getBestMove(boardRows, depth) {
           return;
         }
         cell.textContent = "O";
-        let score = minimax(boardRows, depth, false);
+        let score = minimax(boardRows, depth, -Infinity, Infinity, false);
         cell.textContent = "";
         if (score > bestMove) {
           bestMove = score;
@@ -322,19 +423,30 @@ function getBestMove(boardRows, depth) {
       }
     }
   }
+  move.classList.add("animation");
   move.textContent = "O";
   currentPlayer = human;
   let result = getWinner();
   if (result !== "") {
     backdrop2.setAttribute("style", "display:flex;");
-    winnerCard.textContent = "AI won";
-    playerArray[1].addScore();
-    score.textContent =
-      playerArray[0].getScore() + " - " + playerArray[1].getScore();
+    const winner = getWinner();
+    if (winner === "X") {
+      winnerCard.textContent = playerArray[0].getName() + " won!";
+      playerArray[0].addScore();
+      score.textContent =
+        playerArray[0].getScore() + "  -  " + playerArray[1].getScore();
+    } else if (winner === "O") {
+      winnerCard.textContent = "AI won!";
+      playerArray[1].addScore();
+      score.textContent =
+        playerArray[0].getScore() + "  -  " + playerArray[1].getScore();
+    } else {
+      winnerCard.textContent = "I'ts a draw";
+    }
     return;
   }
 }
-function minimax(boardRows, depth, isMaximizingPlayer) {
+function minimax(boardRows, depth, alpha, beta, isMaximizingPlayer) {
   const result = getWinner();
   if (result !== "" || depth === 0) {
     if (result === "O") return 10;
@@ -355,11 +467,25 @@ function minimax(boardRows, depth, isMaximizingPlayer) {
           return;
         }
         cell.textContent = isMaximizingPlayer ? "O" : "X";
-        const value = minimax(boardRows, depth - 1, !isMaximizingPlayer);
+        const value = minimax(
+          boardRows,
+          depth - 1,
+          alpha,
+          beta,
+          !isMaximizingPlayer
+        );
         cell.textContent = "";
         bestValue = isMaximizingPlayer
           ? Math.max(bestValue, value)
           : Math.min(bestValue, value);
+        if (isMaximizingPlayer) {
+          alpha = Math.max(alpha, bestValue);
+        } else {
+          beta = Math.min(beta, bestValue);
+        }
+        if (beta <= alpha) {
+          break;
+        }
       }
     }
   }
