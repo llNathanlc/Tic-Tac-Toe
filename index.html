@@ -10,26 +10,29 @@
   </head>
   <body>
     <div id="backdrop1">
+      <span id="title" >TIC TAC TOE</span>
       <form id="formm" action="/#" method="post">
-        <div id="gamemode" style="text-align: center">Player vs Player</div>
-        <div>
-          <label for="player1">Add a name for player1</label>
-          <input
-            type="text"
-            name="player1"
-            placeholder="player1"
-            value="player1"
-          />
-        </div>
-        <div>
-          <label id="labelp2" for="player2">Add a name for player2</label>
-          <input
-            id="inputp2"
-            type="text"
-            name="player2"
-            placeholder="player2"
-            value="player2"
-          />
+        <div id="gamemode" class='on' style="text-align: center">Player vs Player</div>
+        <div style="display:flex; justify-content: space-evenly;flex-wrap: wrap;">
+          <div>
+            <label for="player1">Add a name for player1</label>
+            <input
+              type="text"
+              name="player1"
+              placeholder="player1"
+              value="player1"
+            />
+          </div>
+          <div id="parentp2">
+            <label id="labelp2" for="player2">Add a name for player2</label>
+            <input
+              id="inputp2"
+              type="text"
+              name="player2"
+              placeholder="player2"
+              value="player2"
+            />
+          </div>
         </div>
         <button id="start" type="submit">Start Game</button>
       </form>
