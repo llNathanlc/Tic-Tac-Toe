@@ -7,9 +7,10 @@ const gameBoard = (() => {
       turn++;
       gameFlow.resetBoard();
       backdrop2.setAttribute("style", "display:none");
+      const rows = document.querySelectorAll(".row");
       if (gameControl.getGameMode() === "pve" && turn % 2 !== 0) {
         currentPlayer = human;
-        setTimeout(() => getBestMove(tiles, playerArray[1].getName()), 2);
+        setTimeout(() => getBestMove(rows, playerArray[1].getName()), 2);
       }
       if (gameControl.getGameMode() === "pvp" && turn % 2 !== 0) {
         currentPlayer = "player2";
@@ -27,10 +28,6 @@ const gameBoard = (() => {
   return { backdropCard, goBack };
 })();
 
-const on = document.querySelector(".on");
-on.addEventListener("pointerleave", function () {
-  on.classList.add("unhover");
-});
 const playerFactory = (player) => {
   const getName = () => {
     if (player == "easy") return 2;
@@ -150,6 +147,7 @@ const gameFlow = (() => {
         });
         e.addEventListener("pointerup", function () {
           let result = getWinner();
+          getWinningPositions();
           if (result !== "") {
             backdrop2.setAttribute("style", "display:flex;");
             const winner = getWinner();
@@ -202,6 +200,7 @@ const gameFlow = (() => {
     Array.from(document.querySelectorAll(".cell")).forEach((e) => {
       e.textContent = "";
       e.classList.remove("animation");
+      e.setAttribute('style','background-color:rgba(236, 236, 236, 0.427);')
     });
     win.textContent = "";
     score.textContent =
@@ -258,15 +257,46 @@ function getWinningPositions() {
     Array.from(row.children).map((cell) => cell.textContent)
   );
   for (let row = 0; row < 3; row++) {
-    if ((board[row][0] === board[row][1]) === board[row][2]) {
-      tiles[row].children[0].setAttribute("style", "background-color:green;");
-      tiles[row].children[1].setAttribute("style", "background-color:green;");
-      tiles[row].children[2].setAttribute("style", "background-color:green;");
+    if (
+      board[row][0] !== "" &&
+      board[row][0] === board[row][1] &&
+      board[row][0] === board[row][2]
+    ) {
+      tiles[row].children[0].setAttribute("style", "background-color:rgba(2, 190, 2, 0.541);");
+      tiles[row].children[1].setAttribute("style", "background-color:rgba(2, 190, 2, 0.541);");
+      tiles[row].children[2].setAttribute("style", "background-color:rgba(2, 190, 2, 0.541);");
     }
   }
-  console.log(
-    (board[0][0] !== "" && board[0][0] === board[0][1]) === board[0][2]
-  );
+  for (let col = 0; col < 3; col++) {
+    if (
+      board[0][col] !== "" &&
+      board[0][col] === board[1][col] &&
+      board[1][col] === board[2][col]
+    ) {
+      tiles[0].children[col].setAttribute("style", "background-color:rgba(2, 190, 2, 0.541);");
+      tiles[1].children[col].setAttribute("style", "background-color:rgba(2, 190, 2, 0.541);");
+      tiles[2].children[col].setAttribute("style", "background-color:rgba(2, 190, 2, 0.541);");
+    }
+  }
+  if (
+    board[0][0] !== "" &&
+    board[0][0] === board[1][1] &&
+    board[1][1] === board[2][2]
+  ) {
+    tiles[0].children[0].setAttribute("style", "background-color:rgba(2, 190, 2, 0.541);");
+    tiles[1].children[1].setAttribute("style", "background-color:rgba(2, 190, 2, 0.541);");
+    tiles[2].children[2].setAttribute("style", "background-color:rgba(2, 190, 2, 0.541);");
+  }
+
+  if (
+    board[0][2] !== "" &&
+    board[0][2] === board[1][1] &&
+    board[1][1] === board[2][0]
+  ) {
+    tiles[0].children[2].setAttribute("style", "background-color:rgba(2, 190, 2, 0.541);");
+    tiles[1].children[1].setAttribute("style", "background-color:rgba(2, 190, 2, 0.541);");
+    tiles[2].children[0].setAttribute("style", "background-color:rgba(2, 190, 2, 0.541);");
+  }
 }
 function getWinner() {
   let tiles = document.querySelectorAll(".row");
@@ -440,6 +470,7 @@ function getBestMove(boardRows, depth) {
   move.textContent = "O";
   currentPlayer = human;
   let result = getWinner();
+  getWinningPositions();
   if (result !== "") {
     backdrop2.setAttribute("style", "display:flex;");
     const winner = getWinner();
