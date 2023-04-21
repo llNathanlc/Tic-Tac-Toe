@@ -1,13 +1,13 @@
 const playerArray = [];
+let array = [];
 
 const gameBoard = (() => {
-  let tiles = document.querySelectorAll(".row");
   const backdropCard = () => {
     backdrop2.addEventListener("pointerdown", function () {
       turn++;
       gameFlow.resetBoard();
       backdrop2.setAttribute("style", "display:none");
-      if(gameControl.getGameMode() === "pve" && turn % 2 !== 0) {
+      if (gameControl.getGameMode() === "pve" && turn % 2 !== 0) {
         currentPlayer = human;
         setTimeout(() => getBestMove(tiles, playerArray[1].getName()), 2);
       }
@@ -17,21 +17,20 @@ const gameBoard = (() => {
     });
   };
   const goBack = () => {
+    const goback = document.getElementById("goback");
     goback.addEventListener("pointerdown", function () {
       gameFlow.resetAll();
-      console.log(playerArray);
       backdrop1.style.display = "flex";
-      content.style.display = 'none';
+      content.style.display = "none";
     });
   };
-  return { tiles, backdropCard,goBack };
+  return { backdropCard, goBack };
 })();
+
 const on = document.querySelector(".on");
 on.addEventListener("pointerleave", function () {
   on.classList.add("unhover");
 });
-const controller = new AbortController();
-const { signal } = controller;
 const playerFactory = (player) => {
   const getName = () => {
     if (player == "easy") return 2;
@@ -53,9 +52,10 @@ let currentPlayer = "player1";
 let turn = 0;
 let difficulty = 0;
 const gameFlow = (() => {
-  const PvP = (p1, p2) => {
+  const row = document.querySelectorAll(".row");
+  const PvP = (p1, p2, board) => {
     p2.playing = "";
-    gameBoard.tiles.forEach(function (h) {
+    board.forEach(function (h) {
       Array.from(h.children).forEach(function (e) {
         e.addEventListener("pointerdown", function () {
           this.classList.add("animation");
@@ -101,6 +101,7 @@ const gameFlow = (() => {
         });
         e.addEventListener("pointerup", function () {
           let result = getWinner();
+          getWinningPositions();
           if (result !== "") {
             backdrop2.setAttribute("style", "display:flex;");
             const winner = getWinner();
@@ -121,8 +122,8 @@ const gameFlow = (() => {
       });
     });
   };
-  const PvE = (p1, ia) => {
-    gameBoard.tiles.forEach(function (h) {
+  const PvE = (p1, ia, board) => {
+    board.forEach(function (h) {
       Array.from(h.children).forEach(function (e) {
         e.addEventListener("pointerdown", function () {
           this.classList.add("animation");
@@ -162,9 +163,7 @@ const gameFlow = (() => {
             return;
           }
           if (currentPlayer === ai) {
-            setTimeout(() => getBestMove(gameBoard.tiles, ia.getName()), 200);
-            console.log(playerArray)
-            console.log('l')
+            setTimeout(() => getBestMove(board, ia.getName()), 200);
           }
         });
       });
@@ -220,6 +219,7 @@ const gameFlow = (() => {
     });
     win.textContent = "";
     turn = 0;
+    gameboard.replaceWith(gameboard.cloneNode(true));
     gameControl.playerArray[0].resetScore();
     gameControl.playerArray[1].resetScore();
     score.textContent =
@@ -239,7 +239,7 @@ const gameFlow = (() => {
         "animation:highlight-turn 0.5s;animation-fill-mode: forwards"
       );
     }
-    while(playerArray.length !== 0){
+    while (playerArray.length !== 0) {
       playerArray.pop();
     }
   };
@@ -252,10 +252,28 @@ function checkDraw() {
   );
   return isBoardFull;
 }
-function getWinner() {
-  const board = Array.from(gameBoard.tiles).map((row) =>
+function getWinningPositions() {
+  let tiles = document.querySelectorAll(".row");
+  const board = Array.from(tiles).map((row) =>
     Array.from(row.children).map((cell) => cell.textContent)
   );
+  for (let row = 0; row < 3; row++) {
+    if ((board[row][0] === board[row][1]) === board[row][2]) {
+      tiles[row].children[0].setAttribute("style", "background-color:green;");
+      tiles[row].children[1].setAttribute("style", "background-color:green;");
+      tiles[row].children[2].setAttribute("style", "background-color:green;");
+    }
+  }
+  console.log(
+    (board[0][0] !== "" && board[0][0] === board[0][1]) === board[0][2]
+  );
+}
+function getWinner() {
+  let tiles = document.querySelectorAll(".row");
+  const board = Array.from(tiles).map((row) =>
+    Array.from(row.children).map((cell) => cell.textContent)
+  );
+
   let winner = "";
 
   for (const row of board) {
@@ -293,7 +311,7 @@ function getWinner() {
   let openSpots = 0;
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
-      if (gameBoard.tiles[i].children[j].textContent === "") {
+      if (tiles[i].children[j].textContent === "") {
         openSpots++;
       }
     }
@@ -342,6 +360,7 @@ const gameControl = (() => {
     gameMode();
     backdrop1.addEventListener("submit", function (e) {
       e.preventDefault();
+      const rows = document.querySelectorAll(".row");
       if (backdrop1.style.display === "none") {
         backdrop1.style.display = "flex";
       } else {
@@ -354,7 +373,7 @@ const gameControl = (() => {
           key = playerFactory(value);
           playerArray.push(key);
         });
-        gameFlow.PvP(playerArray[0], playerArray[1]);
+        gameFlow.PvP(playerArray[0], playerArray[1], rows);
         player1.textContent = playerArray[0].getName();
         player1.setAttribute(
           "style",
@@ -369,7 +388,7 @@ const gameControl = (() => {
           key = playerFactory(value);
           playerArray.push(key);
         });
-        gameFlow.PvE(playerArray[0], playerArray[1]);
+        gameFlow.PvE(playerArray[0], playerArray[1], rows);
         player1.textContent = playerArray[0].getName();
         player1.setAttribute(
           "style",
@@ -381,13 +400,7 @@ const gameControl = (() => {
       }
     });
   };
-  const reinitialize = () => {
-    if (gamemodeState === 'pvp'){
-      gameFlow.PvP(playerArray[0],playerArray[1]);
-    }
-    else {gameFlow.PvE(playerArray[0],playerArray[1]);}
-  }
-  return { playerArray, startGame, gameMode, getGameMode,reinitialize };
+  return { playerArray, startGame, gameMode, getGameMode };
 })();
 
 gameControl.startGame();
